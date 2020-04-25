@@ -1,9 +1,9 @@
 package main
 
 import (
+	"github.com/feilfeilundfeil/terraform-provider-mssql/resources"
+	"github.com/feilfeilundfeil/terraform-provider-mssql/sql"
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/jayway/terraform-provider-mssql/resources"
-	"github.com/jayway/terraform-provider-mssql/sql"
 )
 
 const connectionString = "connection_string"

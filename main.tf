@@ -21,4 +21,5 @@ resource "random_string" "pwd" {
 resource "mssql_login" "test" {
   username = "${random_string.pwd.keepers.username}"
   password = "${random_string.pwd.result}"
+  usertype = "crud"
 }

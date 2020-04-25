@@ -7,6 +7,7 @@ import (
 
 const usernameProp = "username"
 const passwordProp = "password"
+const typeProp = "usertype"
 
 // Login is the mssql_login resource
 func Login() *schema.Resource {
@@ -18,6 +19,11 @@ func Login() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			usernameProp: &schema.Schema{
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
+			},
+			typeProp: &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -35,8 +41,9 @@ func loginCreate(d *schema.ResourceData, meta interface{}) error {
 	connector := meta.(sql.Connector)
 	username := d.Get(usernameProp).(string)
 	password := d.Get(passwordProp).(string)
+	usertype := d.Get(typeProp).(string)
 
-	err := connector.CreateLogin(username, password)
+	err := connector.CreateLogin(username, password, usertype)
 	if err != nil {
 		return err
 	}
