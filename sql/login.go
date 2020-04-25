@@ -9,7 +9,7 @@ import (
 func (c Connector) CreateLogin(username string, password string, usertype string) error {
 	if usertype == "admin" {
 		cmd := `DECLARE @sql nvarchar(max)
-					SET @sql = 'CREATE USER ' + QuoteName(@username) + ' WITH PASSWORD = ' + QuoteName(@password) + ';
+					SET @sql = 'CREATE USER [' + QuoteName(@username) + '] WITH PASSWORD = ' + QuoteName(@password, '''') + ';
 ALTER ROLE db_datareader ADD MEMBER ' + QuoteName(@username) + ';
 ALTER ROLE db_datawriter ADD MEMBER ' + QuoteName(@username) + ';
 GRANT Alter to ' + QuoteName(@username) + ';
@@ -26,7 +26,7 @@ GRANT Execute to ' + QuoteName(@username) + ';'
 		return c.Execute(cmd, sql.Named("username", username), sql.Named("password", password))
 	} else if usertype == "crud" {
 		cmd := `DECLARE @sql nvarchar(max)
-					SET @sql = 'CREATE USER ' + QuoteName(@username) + ' WITH PASSWORD = ' + QuoteName(@password) + ';
+					SET @sql = 'CREATE USER ' + QuoteName(@username) + ' WITH PASSWORD = ' + QuoteName(@password, '''') + ';
 ALTER ROLE db_datareader ADD MEMBER ' + QuoteName(@username) + ';
 ALTER ROLE db_datawriter ADD MEMBER ' + QuoteName(@username) + ';
 GRANT Update to ' + QuoteName(@username) + ';
