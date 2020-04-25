@@ -2,6 +2,8 @@ package sql
 
 import (
 	"database/sql"
+	"errors"
+	"fmt"
 )
 
 // CreateLogin connects to the SQL Database to create a login with the provided
@@ -9,7 +11,7 @@ import (
 func (c Connector) CreateLogin(username string, password string, usertype string) error {
 	if usertype == "admin" {
 		cmd := `DECLARE @sql nvarchar(max)
-					SET @sql = 'CREATE USER [' + QuoteName(@username) + '] WITH PASSWORD = ' + QuoteName(@password, '''') + ';
+					SET @sql = 'CREATE USER ' + QuoteName(@username) + ' WITH PASSWORD = ' + QuoteName(@password, '''') + ';
 ALTER ROLE db_datareader ADD MEMBER ' + QuoteName(@username) + ';
 ALTER ROLE db_datawriter ADD MEMBER ' + QuoteName(@username) + ';
 GRANT Alter to ' + QuoteName(@username) + ';
@@ -36,7 +38,7 @@ GRANT Insert to ' + QuoteName(@username) + ';'
 					EXEC (@sql)`
 		return c.Execute(cmd, sql.Named("username", username), sql.Named("password", password))
 	}
-	return nil
+	return errors.New(fmt.Sprintf("usertype %v not allowed", usertype))
 }
 
 // DeleteLogin connects to the SQL Database and removes a login with the provided
