@@ -11,7 +11,7 @@ func (c Connector) CreateLogin(username string, password string, usertype string
 					SET @sql = 'CREATE LOGIN ' + QuoteName(@username) + ' ' +
 										 'WITH PASSWORD = ' + QuoteName(@password, '''')
 					EXEC (@sql)`
-	c.Execute(cmd, sql.Named("username", username), sql.Named("password", password))
+	result := c.Execute(cmd, sql.Named("username", username), sql.Named("password", password))
 
 	if usertype == "admin" {
 		cmd := `DECLARE @sql nvarchar(max)
@@ -28,7 +28,7 @@ GRANT Create symmetric key to ' + QuoteName(@username) + ';
 GRANT Create table to ' + QuoteName(@username) + ';
 GRANT Execute to ' + QuoteName(@username) + ';'
 					EXEC (@sql)`
-		return c.Execute(cmd, sql.Named("username", username))
+		c.Execute(cmd, sql.Named("username", username))
 	} else if usertype == "crud" {
 		cmd := `DECLARE @sql nvarchar(max)
 					SET @sql = 'ALTER ROLE db_datareader ADD MEMBER ' + QuoteName(@username) + ';
@@ -38,8 +38,9 @@ GRANT Delete to ' + QuoteName(@username) + ';
 GRANT Select to ' + QuoteName(@username) + ';
 GRANT Insert to ' + QuoteName(@username) + ';'
 					EXEC (@sql)`
-		return c.Execute(cmd, sql.Named("username", username))
+		c.Execute(cmd, sql.Named("username", username))
 	}
+	return result
 }
 
 // DeleteLogin connects to the SQL Database and removes a login with the provided
