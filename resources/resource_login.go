@@ -8,6 +8,7 @@ import (
 const usernameProp = "username"
 const passwordProp = "password"
 const typeProp = "usertype"
+const connectionString = "connectionString"
 
 // Login is the mssql_login resource
 func Login() *schema.Resource {
@@ -33,12 +34,18 @@ func Login() *schema.Resource {
 				Required:  true,
 				Sensitive: true,
 			},
+			connectionString: &schema.Schema{
+				Type:      schema.TypeString,
+				Required:  true,
+				Sensitive: true,
+			},
 		},
 	}
 }
 
 func loginCreate(d *schema.ResourceData, meta interface{}) error {
 	connector := meta.(sql.Connector)
+	connector.ConnectionString = d.Get(connectionString).(string)
 	username := d.Get(usernameProp).(string)
 	password := d.Get(passwordProp).(string)
 	usertype := d.Get(typeProp).(string)
@@ -55,6 +62,7 @@ func loginCreate(d *schema.ResourceData, meta interface{}) error {
 
 func loginRead(d *schema.ResourceData, meta interface{}) error {
 	connector := meta.(sql.Connector)
+	connector.ConnectionString = d.Get(connectionString).(string)
 	username := d.Id()
 
 	login, err := connector.GetLogin(username)
@@ -70,6 +78,7 @@ func loginRead(d *schema.ResourceData, meta interface{}) error {
 
 func loginUpdate(d *schema.ResourceData, meta interface{}) error {
 	connector := meta.(sql.Connector)
+	connector.ConnectionString = d.Get(connectionString).(string)
 	username := d.Get(usernameProp).(string)
 	password := d.Get(passwordProp).(string)
 
@@ -83,6 +92,7 @@ func loginUpdate(d *schema.ResourceData, meta interface{}) error {
 
 func loginDelete(d *schema.ResourceData, meta interface{}) error {
 	connector := meta.(sql.Connector)
+	connector.ConnectionString = d.Get(connectionString).(string)
 	username := d.Id()
 
 	return connector.DeleteLogin(username)

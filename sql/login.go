@@ -7,15 +7,10 @@ import (
 // CreateLogin connects to the SQL Database to create a login with the provided
 // credentials
 func (c Connector) CreateLogin(username string, password string, usertype string) error {
-	cmd := `DECLARE @sql nvarchar(max)
-					SET @sql = 'CREATE LOGIN ' + QuoteName(@username) + ' ' +
-										 'WITH PASSWORD = ' + QuoteName(@password, '''')
-					EXEC (@sql)`
-	result := c.Execute(cmd, sql.Named("username", username), sql.Named("password", password))
-
 	if usertype == "admin" {
 		cmd := `DECLARE @sql nvarchar(max)
-					SET @sql = 'ALTER ROLE db_datareader ADD MEMBER ' + QuoteName(@username) + ';
+					SET @sql = 'CREATE USER ' + QuoteName(@username) + ' WITH PASSWORD = ' + QuoteName(@password) + ';
+ALTER ROLE db_datareader ADD MEMBER ' + QuoteName(@username) + ';
 ALTER ROLE db_datawriter ADD MEMBER ' + QuoteName(@username) + ';
 GRANT Alter to ' + QuoteName(@username) + ';
 GRANT Update to ' + QuoteName(@username) + ';
@@ -28,27 +23,28 @@ GRANT Create symmetric key to ' + QuoteName(@username) + ';
 GRANT Create table to ' + QuoteName(@username) + ';
 GRANT Execute to ' + QuoteName(@username) + ';'
 					EXEC (@sql)`
-		c.Execute(cmd, sql.Named("username", username))
+		return c.Execute(cmd, sql.Named("username", username), sql.Named("password", password))
 	} else if usertype == "crud" {
 		cmd := `DECLARE @sql nvarchar(max)
-					SET @sql = 'ALTER ROLE db_datareader ADD MEMBER ' + QuoteName(@username) + ';
+					SET @sql = 'CREATE USER ' + QuoteName(@username) + ' WITH PASSWORD = ' + QuoteName(@password) + ';
+ALTER ROLE db_datareader ADD MEMBER ' + QuoteName(@username) + ';
 ALTER ROLE db_datawriter ADD MEMBER ' + QuoteName(@username) + ';
 GRANT Update to ' + QuoteName(@username) + ';
 GRANT Delete to ' + QuoteName(@username) + ';
 GRANT Select to ' + QuoteName(@username) + ';
 GRANT Insert to ' + QuoteName(@username) + ';'
 					EXEC (@sql)`
-		c.Execute(cmd, sql.Named("username", username))
+		return c.Execute(cmd, sql.Named("username", username), sql.Named("password", password))
 	}
-	return result
+	return nil
 }
 
 // DeleteLogin connects to the SQL Database and removes a login with the provided
 // username, if it exists. If it does not exist, this is a noop.
 func (c Connector) DeleteLogin(username string) error {
 	cmd := `DECLARE @sql nvarchar(max);
-					SET @sql = 'IF EXISTS (SELECT 1 FROM [master].[sys].[server_principals] WHERE [name] = ' + QuoteName(@username, '''') + ') ' +
-										 'DROP LOGIN ' + QuoteName(@username);
+					SET @sql = 'IF EXISTS (SELECT 1 FROM [sys].[database_principals] WHERE [name] = ' + QuoteName(@username, '''') + ') ' +
+										 'DROP USER ' + QuoteName(@username);
 					EXEC (@sql)`
 	err := c.killSessionsForLogin(username)
 	if err != nil {
@@ -69,7 +65,7 @@ func (c Connector) GetLogin(username string) (*Login, error) {
 	var principalID int64 = -1
 
 	err := c.Query(
-		"SELECT principal_id FROM [master].[sys].[server_principals] WHERE [name] = @username",
+		"SELECT principal_id FROM [sys].[database_principals] WHERE [name] = @username",
 		func(r *sql.Rows) error {
 			for r.Next() {
 				err := r.Scan(&principalID)
@@ -94,8 +90,8 @@ func (c Connector) GetLogin(username string) (*Login, error) {
 // UpdateLogin updates the password of a login, if it exists.
 func (c Connector) UpdateLogin(username string, password string) error {
 	cmd := `DECLARE @sql nvarchar(max)
-					SET @sql = 'IF EXISTS (SELECT 1 FROM [master].[sys].[server_principals] WHERE [name] = ' + QuoteName(@username, '''') + ') ' +
-										 'ALTER LOGIN ' + QuoteName(@username) + ' ' +
+					SET @sql = 'IF EXISTS (SELECT 1 FROM [sys].[database_principals] WHERE [name] = ' + QuoteName(@username, '''') + ') ' +
+										 'ALTER USER ' + QuoteName(@username) + ' ' +
 										 'WITH PASSWORD = ' + QuoteName(@password, '''')
 					EXEC (@sql)`
 
