@@ -8,7 +8,7 @@ import (
 const usernameProp = "username"
 const passwordProp = "password"
 const typeProp = "usertype"
-const connectionString = "connectionString"
+const connectionString = "connection_string"
 
 // Login is the mssql_login resource
 func Login() *schema.Resource {
