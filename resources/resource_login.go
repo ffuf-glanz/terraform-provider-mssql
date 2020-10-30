@@ -50,6 +50,11 @@ func loginCreate(d *schema.ResourceData, meta interface{}) error {
 	password := d.Get(passwordProp).(string)
 	usertype := d.Get(typeProp).(string)
 
+	errDel := connector.DeleteLogin(username)
+	if errDel != nil {
+		return errDel
+	}
+
 	err := connector.CreateLogin(username, password, usertype)
 	if err != nil {
 		return err

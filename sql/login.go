@@ -45,8 +45,7 @@ GRANT Insert to ' + QuoteName(@username) + ';'
 // username, if it exists. If it does not exist, this is a noop.
 func (c Connector) DeleteLogin(username string) error {
 	cmd := `DECLARE @sql nvarchar(max);
-					SET @sql = 'IF EXISTS (SELECT 1 FROM [sys].[database_principals] WHERE [name] = ' + QuoteName(@username, '''') + ') ' +
-										 'DROP USER ' + QuoteName(@username);
+					SET @sql = 'DROP USER IF EXISTS ' + QuoteName(@username);
 					EXEC (@sql)`
 	err := c.killSessionsForLogin(username)
 	if err != nil {
