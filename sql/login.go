@@ -37,7 +37,14 @@ GRANT Select to ' + QuoteName(@username) + ';
 GRANT Insert to ' + QuoteName(@username) + ';'
 					EXEC (@sql)`
 		return c.Execute(cmd, sql.Named("username", username), sql.Named("password", password))
-	}
+	} else if usertype == "readonly" {
+        cmd := `DECLARE @sql nvarchar(max)
+                    SET @sql = 'CREATE USER ' + QuoteName(@username) + ' WITH PASSWORD = ' + QuoteName(@password, '''') + ';
+ALTER ROLE db_datareader ADD MEMBER ' + QuoteName(@username) + ';
+GRANT Select to ' + QuoteName(@username) + ';
+                    EXEC (@sql)`
+        return c.Execute(cmd, sql.Named("username", username), sql.Named("password", password))
+    }
 	return errors.New(fmt.Sprintf("usertype %v not allowed", usertype))
 }
 
