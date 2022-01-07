@@ -1,4 +1,6 @@
 *.exe
-terraform-provider-mssql
+terraform-provider-mssql_*
 .terraform
-*.tfstate*
+*.tfstate
+.idea
+vendor/
