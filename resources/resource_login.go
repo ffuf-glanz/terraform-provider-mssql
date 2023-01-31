@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"github.com/ffuf-glanz/terraform-provider-mssql/sql"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"terraform-provider-mssql/sql"
 )
 
 const usernameProp = "username"
