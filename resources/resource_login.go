@@ -1,7 +1,7 @@
 package resources
 
 import (
-	"github.com/feilfeilundfeil/terraform-provider-mssql/sql"
+	"github.com/ffuf-glanz/terraform-provider-mssql/sql"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 

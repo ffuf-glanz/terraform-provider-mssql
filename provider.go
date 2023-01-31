@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/feilfeilundfeil/terraform-provider-mssql/resources"
 	"github.com/feilfeilundfeil/terraform-provider-mssql/sql"
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 const connectionString = "connection_string"
