@@ -1,6 +1,6 @@
 NAME=mssql
 VERSION=0.0.2
-BINARY=${NAME}_${VERSION}
+BINARY=terraform-provider-${NAME}_v${VERSION}
 
 default: build
 
